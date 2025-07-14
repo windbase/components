@@ -10,6 +10,7 @@ import {
 	CardHeader,
 	CardTitle
 } from '@/components/ui/card';
+import { Pagination } from '@/components/ui/pagination';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useComponents } from '../hooks/useComponents';
 import type { Component } from '../types/component';
@@ -18,7 +19,8 @@ import { ComponentForm } from './ComponentForm';
 export function ComponentBuilder() {
 	const {
 		components,
-		loading,
+		paginationData,
+		loadComponents,
 		createComponent,
 		updateComponent,
 		deleteComponent
@@ -49,6 +51,8 @@ export function ComponentBuilder() {
 			// Check if the name/ID has changed
 			const nameChanged = editingComponent.metadata.id !== data.metadata.id;
 			await updateComponent(editingComponent.metadata.id, data, nameChanged);
+			// Reload components to reflect changes
+			loadComponents(paginationData.currentPage, 12, activeTab);
 		} else {
 			const success = await createComponent(data);
 			if (success) {
@@ -62,6 +66,8 @@ export function ComponentBuilder() {
 	const handleDeleteComponent = async (id: string) => {
 		if (confirm('Are you sure you want to delete this component?')) {
 			await deleteComponent(id);
+			// Reload components to reflect changes
+			loadComponents(paginationData.currentPage, 12, activeTab);
 		}
 	};
 
@@ -92,17 +98,15 @@ export function ComponentBuilder() {
 		// You could add a toast notification here
 	};
 
-	const filteredComponents = components.filter(
-		(comp) => comp.type === activeTab
-	);
+	const handleTabChange = (value: string) => {
+		setActiveTab(value);
+		// Reset pagination when switching tabs and load components for new type
+		loadComponents(1, 12, value);
+	};
 
-	if (loading) {
-		return (
-			<div className="flex items-center justify-center h-64">
-				<div className="text-lg">Loading components...</div>
-			</div>
-		);
-	}
+	const handlePageChange = (page: number) => {
+		loadComponents(page, 12, activeTab);
+	};
 
 	return (
 		<div className="max-w-7xl mx-auto px-4 py-8">
@@ -126,7 +130,11 @@ export function ComponentBuilder() {
 				</div>
 			</div>
 
-			<Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+			<Tabs
+				value={activeTab}
+				onValueChange={handleTabChange}
+				className="w-full"
+			>
 				<TabsList className="grid w-full grid-cols-2">
 					<TabsTrigger value="blocks">Blocks</TabsTrigger>
 					<TabsTrigger value="templates">Templates</TabsTrigger>
@@ -134,23 +142,33 @@ export function ComponentBuilder() {
 
 				<TabsContent value="blocks" className="mt-6">
 					<ComponentGrid
-						components={filteredComponents}
+						components={components}
 						onEdit={handleEditComponent}
 						onOpenEditor={handleOpenEditor}
 						onDelete={handleDeleteComponent}
 						onPreview={handlePreview}
 						onCopyCode={handleCopyCode}
 					/>
+					<Pagination
+						currentPage={paginationData.currentPage}
+						totalPages={paginationData.totalPages}
+						onPageChange={handlePageChange}
+					/>
 				</TabsContent>
 
 				<TabsContent value="templates" className="mt-6">
 					<ComponentGrid
-						components={filteredComponents}
+						components={components}
 						onEdit={handleEditComponent}
 						onOpenEditor={handleOpenEditor}
 						onDelete={handleDeleteComponent}
 						onPreview={handlePreview}
 						onCopyCode={handleCopyCode}
+					/>
+					<Pagination
+						currentPage={paginationData.currentPage}
+						totalPages={paginationData.totalPages}
+						onPageChange={handlePageChange}
 					/>
 				</TabsContent>
 			</Tabs>
