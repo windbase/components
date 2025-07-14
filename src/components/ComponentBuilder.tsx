@@ -74,7 +74,7 @@ export function ComponentBuilder() {
 	const handlePreview = (html: string) => {
 		const newWindow = window.open('', '_blank');
 		if (newWindow) {
-			newWindow.document.write(`
+			newWindow.document.writeln(`
         <!DOCTYPE html>
         <html>
           <head>
@@ -245,7 +245,7 @@ function ComponentCard({
 	onCopyCode
 }: ComponentCardProps) {
 	return (
-		<Card className="group relative overflow-hidden transition-all hover:shadow-lg">
+		<Card className="group relative overflow-hidden transition-all">
 			<CardHeader className="pb-3">
 				<div className="flex items-start justify-between">
 					<div className="flex-1">

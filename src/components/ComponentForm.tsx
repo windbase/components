@@ -12,6 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import MultipleSelector, { type Option } from '@/components/ui/multiselect';
 import {
 	Select,
 	SelectContent,
@@ -21,10 +22,72 @@ import {
 } from '@/components/ui/select';
 import type { Component } from '../types/component';
 
+// Predefined tag options for components
+const TAG_OPTIONS: Option[] = [
+	{ value: 'header', label: 'Header' },
+	{ value: 'hero', label: 'Hero' },
+	{ value: 'navigation', label: 'Navigation' },
+	{ value: 'footer', label: 'Footer' },
+	{ value: 'sidebar', label: 'Sidebar' },
+	{ value: 'card', label: 'Card' },
+	{ value: 'button', label: 'Button' },
+	{ value: 'form', label: 'Form' },
+	{ value: 'input', label: 'Input' },
+	{ value: 'modal', label: 'Modal' },
+	{ value: 'dropdown', label: 'Dropdown' },
+	{ value: 'table', label: 'Table' },
+	{ value: 'list', label: 'List' },
+	{ value: 'grid', label: 'Grid' },
+	{ value: 'layout', label: 'Layout' },
+	{ value: 'content', label: 'Content' },
+	{ value: 'feature', label: 'Feature' },
+	{ value: 'testimonial', label: 'Testimonial' },
+	{ value: 'pricing', label: 'Pricing' },
+	{ value: 'contact', label: 'Contact' },
+	{ value: 'about', label: 'About' },
+	{ value: 'gallery', label: 'Gallery' },
+	{ value: 'blog', label: 'Blog' },
+	{ value: 'ecommerce', label: 'E-commerce' },
+	{ value: 'dashboard', label: 'Dashboard' },
+	{ value: 'profile', label: 'Profile' },
+	{ value: 'settings', label: 'Settings' },
+	{ value: 'search', label: 'Search' },
+	{ value: 'notification', label: 'Notification' },
+	{ value: 'alert', label: 'Alert' },
+	{ value: 'loading', label: 'Loading' },
+	{ value: 'error', label: 'Error' },
+	{ value: 'empty-state', label: 'Empty State' },
+	{ value: 'call-to-action', label: 'Call to Action' },
+	{ value: 'banner', label: 'Banner' },
+	{ value: 'carousel', label: 'Carousel' },
+	{ value: 'tabs', label: 'Tabs' },
+	{ value: 'accordion', label: 'Accordion' },
+	{ value: 'tooltip', label: 'Tooltip' },
+	{ value: 'badge', label: 'Badge' },
+	{ value: 'avatar', label: 'Avatar' },
+	{ value: 'progress', label: 'Progress' },
+	{ value: 'breadcrumb', label: 'Breadcrumb' },
+	{ value: 'pagination', label: 'Pagination' },
+	{ value: 'responsive', label: 'Responsive' },
+	{ value: 'mobile', label: 'Mobile' },
+	{ value: 'desktop', label: 'Desktop' },
+	{ value: 'dark-mode', label: 'Dark Mode' },
+	{ value: 'animation', label: 'Animation' },
+	{ value: 'interactive', label: 'Interactive' },
+	{ value: 'utility', label: 'Utility' }
+];
+
 const componentSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	type: z.enum(['blocks', 'templates']),
-	tags: z.string().min(1, 'Tags are required'),
+	tags: z
+		.array(
+			z.object({
+				value: z.string(),
+				label: z.string()
+			})
+		)
+		.min(1, 'At least one tag is required'),
 	author: z.string().min(1, 'Author is required')
 });
 
@@ -55,26 +118,34 @@ export function ComponentForm({
 		defaultValues: {
 			name: editingComponent?.metadata.name || '',
 			type: editingComponent?.type || 'blocks',
-			tags: editingComponent?.metadata.tags.join(', ') || '',
+			tags:
+				editingComponent?.metadata.tags?.map((tag) => ({
+					value: tag,
+					label: tag.charAt(0).toUpperCase() + tag.slice(1)
+				})) || [],
 			author: editingComponent?.metadata.author || ''
 		}
 	});
 
 	const watchedType = watch('type');
+	const watchedTags = watch('tags');
 
 	React.useEffect(() => {
 		if (editingComponent) {
 			reset({
 				name: editingComponent.metadata.name,
 				type: editingComponent.type,
-				tags: editingComponent.metadata.tags.join(', '),
+				tags: editingComponent.metadata.tags.map((tag) => ({
+					value: tag,
+					label: tag.charAt(0).toUpperCase() + tag.slice(1)
+				})),
 				author: editingComponent.metadata.author
 			});
 		} else {
 			reset({
 				name: '',
 				type: 'blocks',
-				tags: '',
+				tags: [],
 				author: ''
 			});
 		}
@@ -88,7 +159,7 @@ export function ComponentForm({
 			metadata: {
 				id: newId,
 				name: data.name,
-				tags: data.tags.split(',').map((tag) => tag.trim()),
+				tags: data.tags.map((tag) => tag.value),
 				author: data.author
 			},
 			html: '<div class="p-4 bg-gray-100 rounded-lg">\n  <!-- Start building your component here -->\n  <p class="text-gray-600">Your component content goes here...</p>\n</div>',
@@ -152,6 +223,29 @@ export function ComponentForm({
 					</div>
 
 					<div>
+						<Label htmlFor="tags">Tags</Label>
+						<MultipleSelector
+							value={watchedTags as Option[]}
+							onChange={(options) => setValue('tags', options)}
+							defaultOptions={TAG_OPTIONS}
+							placeholder="Select tags for your component..."
+							emptyIndicator={
+								<p className="text-center text-sm leading-10 text-muted-foreground">
+									No tags found.
+								</p>
+							}
+							className="mt-1"
+							maxSelected={4}
+							onMaxSelected={(maxLimit) => {
+								console.log(`You can select up to ${maxLimit} tags`);
+							}}
+						/>
+						{errors.tags && (
+							<p className="text-sm text-red-500 mt-1">{errors.tags.message}</p>
+						)}
+					</div>
+
+					<div>
 						<Label htmlFor="author">Author</Label>
 						<Input
 							id="author"
@@ -163,19 +257,6 @@ export function ComponentForm({
 							<p className="text-sm text-red-500 mt-1">
 								{errors.author.message}
 							</p>
-						)}
-					</div>
-
-					<div>
-						<Label htmlFor="tags">Tags (comma-separated)</Label>
-						<Input
-							id="tags"
-							{...register('tags')}
-							placeholder="header, hero, call-to-action"
-							className="mt-1"
-						/>
-						{errors.tags && (
-							<p className="text-sm text-red-500 mt-1">{errors.tags.message}</p>
 						)}
 					</div>
 

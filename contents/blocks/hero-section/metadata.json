@@ -1,6 +1,9 @@
 {
   "id": "hero-section",
   "name": "Hero Section",
-  "tags": ["header", "hero", "call-to-action"],
+  "tags": [
+    "hero",
+    "call-to-action"
+  ],
   "author": "Windbase Team"
-} 
+}
