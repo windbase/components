@@ -26,7 +26,7 @@ interface ComponentEditorProps {
 export function ComponentEditor({ type }: ComponentEditorProps) {
 	const { id } = useParams<{ id: string }>();
 	const navigate = useNavigate();
-	const { components, updateComponent } = useComponents();
+	const { components, updateComponent, loadComponents } = useComponents();
 
 	const [component, setComponent] = useState<Component | null>(null);
 	const [htmlCode, setHtmlCode] = useState('');
@@ -36,6 +36,11 @@ export function ComponentEditor({ type }: ComponentEditorProps) {
 	>('desktop');
 	const [isSaving, setIsSaving] = useState(false);
 	const [isDarkMode] = useState(false);
+
+	// Load components when component mounts
+	useEffect(() => {
+		loadComponents(1, 1000, 'all'); // Load all components to find the one we need
+	}, [loadComponents]);
 
 	useEffect(() => {
 		if (id && components.length > 0) {
