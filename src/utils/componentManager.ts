@@ -1,4 +1,5 @@
 import {
+	copyFileSync,
 	existsSync,
 	mkdirSync,
 	readdirSync,
@@ -189,17 +190,53 @@ export class ComponentManager {
 			}
 
 			if (nameChanged) {
-				// Remove old component folder
 				const oldComponentPath = this.getComponentPath(
 					originalComponent.type,
 					originalComponent.folder
 				);
+				const oldPreviewPath = this.getPreviewPath(
+					originalComponent.type,
+					originalComponent.folder
+				);
+				const oldHtmlPath = this.getHtmlPath(
+					originalComponent.type,
+					originalComponent.folder
+				);
+
+				// Create new component directory
+				const newComponentPath = this.getComponentPath(
+					component.type,
+					component.folder
+				);
+				mkdirSync(newComponentPath, { recursive: true });
+
+				// Copy existing HTML content to new location
+				if (existsSync(oldHtmlPath)) {
+					copyFileSync(oldHtmlPath, this.getHtmlPath(component.type, component.folder));
+				}
+
+				// Copy existing preview to new location if it exists and no new screenshot provided
+				if (existsSync(oldPreviewPath) && !screenshotData) {
+					copyFileSync(oldPreviewPath, this.getPreviewPath(component.type, component.folder));
+				}
+
+				// Write updated metadata to new location
+				writeFileSync(
+					this.getMetadataPath(component.type, component.folder),
+					JSON.stringify(component.metadata, null, 2)
+				);
+
+				// Generate new preview if screenshot data is provided
+				if (screenshotData) {
+					this.saveScreenshot(component.type, component.folder, screenshotData);
+				}
+
+				// Remove old component folder
 				if (existsSync(oldComponentPath)) {
 					rmSync(oldComponentPath, { recursive: true });
 				}
 
-				// Create new component (like creating a new one)
-				return this.createComponent(component, screenshotData);
+				return true;
 			} else {
 				// Update existing component in place
 				this.getComponentPath(component.type, component.folder);
