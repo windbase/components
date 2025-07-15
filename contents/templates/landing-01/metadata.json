@@ -1,8 +1,6 @@
 {
-  "id": "landing-01",
-  "name": "landing-01",
-  "categories": [
-    "landing"
-  ],
-  "author": "Yo"
+	"id": "landing-01",
+	"name": "landing-01",
+	"categories": ["landing"],
+	"author": "Yo"
 }

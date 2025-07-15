@@ -1,10 +1,6 @@
 {
-  "id": "feature-02",
-  "name": "Feature 02",
-  "categories": [
-    "card",
-    "feature",
-    "showcase"
-  ],
-  "author": "Windbase Team"
+	"id": "feature-02",
+	"name": "Feature 02",
+	"categories": ["card", "feature", "showcase"],
+	"author": "Windbase Team"
 }

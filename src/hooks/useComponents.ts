@@ -23,40 +23,39 @@ export function useComponents() {
 		hasPreviousPage: false
 	});
 
-	const loadComponents = useCallback(async (
-		page: number = 1,
-		limit: number = 12,
-		type: string = 'all'
-	) => {
-		try {
-			setLoading(true);
-			const params = new URLSearchParams({
-				page: page.toString(),
-				limit: limit.toString(),
-				type: type
-			});
-
-			const response = await fetch(`/api/components?${params}`);
-			const result = await response.json();
-
-			if (result.success) {
-				setComponents(result.data);
-				setPaginationData({
-					currentPage: result.currentPage,
-					totalPages: result.totalPages,
-					totalItems: result.totalItems,
-					hasNextPage: result.hasNextPage,
-					hasPreviousPage: result.hasPreviousPage
+	const loadComponents = useCallback(
+		async (page: number = 1, limit: number = 12, type: string = 'all') => {
+			try {
+				setLoading(true);
+				const params = new URLSearchParams({
+					page: page.toString(),
+					limit: limit.toString(),
+					type: type
 				});
-			} else {
-				console.error('Error loading components:', result.error);
+
+				const response = await fetch(`/api/components?${params}`);
+				const result = await response.json();
+
+				if (result.success) {
+					setComponents(result.data);
+					setPaginationData({
+						currentPage: result.currentPage,
+						totalPages: result.totalPages,
+						totalItems: result.totalItems,
+						hasNextPage: result.hasNextPage,
+						hasPreviousPage: result.hasPreviousPage
+					});
+				} else {
+					console.error('Error loading components:', result.error);
+				}
+			} catch (error) {
+				console.error('Error loading components:', error);
+			} finally {
+				setLoading(false);
 			}
-		} catch (error) {
-			console.error('Error loading components:', error);
-		} finally {
-			setLoading(false);
-		}
-	}, []);
+		},
+		[]
+	);
 
 	const createComponent = async (componentData: Component) => {
 		try {
@@ -94,8 +93,8 @@ export function useComponents() {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ 
-					component: componentData, 
+				body: JSON.stringify({
+					component: componentData,
 					nameChanged
 				})
 			});
@@ -149,9 +148,9 @@ export function useComponents() {
 		}
 	};
 
-	  useEffect(() => {
-    loadComponents(1, 12, 'all');
-  }, [loadComponents]);
+	useEffect(() => {
+		loadComponents(1, 12, 'all');
+	}, [loadComponents]);
 
 	return {
 		components,

@@ -69,10 +69,11 @@ export function buildComponents() {
 
 						// Copy preview.png file if it exists
 						if (existsSync(previewPath)) {
-							copyFileSync(previewPath, join(distPath, type, `${metadata.id}.png`));
+							copyFileSync(
+								previewPath,
+								join(distPath, type, `${metadata.id}.png`)
+							);
 						}
-
-						console.log(`✓ Built ${type}/${metadata.id}`);
 					} catch (error) {
 						console.error(`✗ Error building ${type}/${componentName}:`, error);
 					}

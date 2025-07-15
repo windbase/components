@@ -28,12 +28,16 @@ export class ComponentManager {
 		return join(this.getComponentPath(type, folder), 'preview.png');
 	}
 
-	private saveScreenshot(type: string, folder: string, screenshotData: string): void {
+	private saveScreenshot(
+		type: string,
+		folder: string,
+		screenshotData: string
+	): void {
 		try {
 			// Convert base64 data URL to buffer
 			const base64Data = screenshotData.replace(/^data:image\/png;base64,/, '');
 			const buffer = Buffer.from(base64Data, 'base64');
-			
+
 			// Write the buffer to preview.png
 			writeFileSync(this.getPreviewPath(type, folder), buffer);
 		} catch (error) {
@@ -129,7 +133,10 @@ export class ComponentManager {
 		return result.data;
 	}
 
-	async createComponent(component: Component, screenshotData: string | null = null): Promise<boolean> {
+	async createComponent(
+		component: Component,
+		screenshotData: string | null = null
+	): Promise<boolean> {
 		try {
 			const componentPath = this.getComponentPath(
 				component.type,

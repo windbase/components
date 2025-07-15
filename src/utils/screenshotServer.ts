@@ -58,7 +58,7 @@ export async function generateScreenshot(htmlContent: string): Promise<Buffer> {
 
 		// Take screenshot
 		const screenshot = await page.locator('body').screenshot({
-			type: 'png',
+			type: 'png'
 		});
 
 		return Buffer.from(screenshot);

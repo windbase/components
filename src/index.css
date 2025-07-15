@@ -1,18 +1,18 @@
 @import "../styles/globals.css";
 
 @layer base {
-  :root {
-    @apply font-sans;
-  }
+	:root {
+		@apply font-sans;
+	}
 
-  body {
-    @apply min-w-[320px] min-h-screen relative m-0 bg-background text-foreground;
-  }
+	body {
+		@apply min-w-[320px] min-h-screen relative m-0 bg-background text-foreground;
+	}
 }
 
 .line-clamp-3 {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 3;
+	-webkit-box-orient: vertical;
+	overflow: hidden;
 }

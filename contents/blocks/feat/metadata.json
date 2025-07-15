@@ -1,8 +1,6 @@
 {
-  "id": "feat",
-  "name": "feat",
-  "categories": [
-    "header"
-  ],
-  "author": "Yo"
+	"id": "feat",
+	"name": "feat",
+	"categories": ["header"],
+	"author": "Yo"
 }
