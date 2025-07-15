@@ -24,6 +24,23 @@ export class ComponentManager {
 		return join(this.getComponentPath(type, folder), 'index.html');
 	}
 
+	private getPreviewPath(type: string, folder: string): string {
+		return join(this.getComponentPath(type, folder), 'preview.png');
+	}
+
+	private saveScreenshot(type: string, folder: string, screenshotData: string): void {
+		try {
+			// Convert base64 data URL to buffer
+			const base64Data = screenshotData.replace(/^data:image\/png;base64,/, '');
+			const buffer = Buffer.from(base64Data, 'base64');
+			
+			// Write the buffer to preview.png
+			writeFileSync(this.getPreviewPath(type, folder), buffer);
+		} catch (error) {
+			console.error('Error saving screenshot:', error);
+		}
+	}
+
 	async loadComponents(
 		page: number = 1,
 		limit: number = 12,
@@ -112,7 +129,7 @@ export class ComponentManager {
 		return result.data;
 	}
 
-	async createComponent(component: Component): Promise<boolean> {
+	async createComponent(component: Component, screenshotData: string | null = null): Promise<boolean> {
 		try {
 			const componentPath = this.getComponentPath(
 				component.type,
@@ -134,6 +151,11 @@ export class ComponentManager {
 				component.html
 			);
 
+			// Write preview image if provided
+			if (screenshotData) {
+				this.saveScreenshot(component.type, component.folder, screenshotData);
+			}
+
 			return true;
 		} catch (error) {
 			console.error('Error creating component:', error);
@@ -144,7 +166,8 @@ export class ComponentManager {
 	async updateComponent(
 		originalId: string,
 		component: Component,
-		nameChanged: boolean = false
+		nameChanged: boolean = false,
+		screenshotData: string | null = null
 	): Promise<boolean> {
 		try {
 			// Find the original component to get its current location
@@ -169,7 +192,7 @@ export class ComponentManager {
 				}
 
 				// Create new component (like creating a new one)
-				return this.createComponent(component);
+				return this.createComponent(component, screenshotData);
 			} else {
 				// Update existing component in place
 				this.getComponentPath(component.type, component.folder);
@@ -185,6 +208,11 @@ export class ComponentManager {
 					this.getHtmlPath(component.type, component.folder),
 					component.html
 				);
+
+				// Update preview image if provided
+				if (screenshotData) {
+					this.saveScreenshot(component.type, component.folder, screenshotData);
+				}
 
 				return true;
 			}

@@ -1,6 +1,7 @@
 import { serve } from 'bun';
 import index from './index.html';
 import { componentManager } from './utils/componentManager';
+import { generateScreenshotDataURL } from './utils/screenshotServer';
 
 const server = serve({
 	routes: {
@@ -31,7 +32,20 @@ const server = serve({
 			async POST(req) {
 				try {
 					const component = await req.json();
-					const success = await componentManager.createComponent(component);
+
+					// Generate screenshot using Puppeteer
+					let screenshotData: string | null = null;
+					try {
+						screenshotData = await generateScreenshotDataURL(component.html);
+					} catch (screenshotError) {
+						console.warn('Failed to generate screenshot:', screenshotError);
+						// Continue saving without screenshot
+					}
+
+					const success = await componentManager.createComponent(
+						component,
+						screenshotData
+					);
 					return Response.json({ success, data: component });
 				} catch (error) {
 					return Response.json(
@@ -48,10 +62,21 @@ const server = serve({
 					const id = req.params.id;
 					const body = await req.json();
 					const { component, nameChanged } = body;
+
+					// Generate screenshot using Puppeteer
+					let screenshotData: string | null = null;
+					try {
+						screenshotData = await generateScreenshotDataURL(component.html);
+					} catch (screenshotError) {
+						console.warn('Failed to generate screenshot:', screenshotError);
+						// Continue saving without screenshot
+					}
+
 					const success = await componentManager.updateComponent(
 						id,
 						component,
-						nameChanged
+						nameChanged,
+						screenshotData
 					);
 					return Response.json({ success, data: component });
 				} catch (error) {

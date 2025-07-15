@@ -94,7 +94,10 @@ export function useComponents() {
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ component: componentData, nameChanged })
+				body: JSON.stringify({ 
+					component: componentData, 
+					nameChanged
+				})
 			});
 
 			const result = await response.json();
