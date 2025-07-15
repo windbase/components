@@ -8,14 +8,21 @@ import {
 import { join } from 'node:path';
 import type { ComponentMetadata } from '../types/component';
 
+interface PaginatedOutput {
+	items: ComponentMetadata[];
+	page: number;
+	hasNextPage: boolean;
+}
+
 interface BuildOutput {
-	blocks: { [key: string]: ComponentMetadata };
-	templates: { [key: string]: ComponentMetadata };
+	blocks: ComponentMetadata[];
+	templates: ComponentMetadata[];
 }
 
 export function buildComponents() {
 	const distPath = join(process.cwd(), 'dist');
 	const contentsPath = join(process.cwd(), 'contents');
+	const ITEMS_PER_PAGE = 10;
 
 	// Create dist directory if it doesn't exist
 	if (!existsSync(distPath)) {
@@ -27,8 +34,8 @@ export function buildComponents() {
 	mkdirSync(join(distPath, 'templates'), { recursive: true });
 
 	const output: BuildOutput = {
-		blocks: {},
-		templates: {}
+		blocks: [],
+		templates: []
 	};
 
 	// Process blocks and templates
@@ -52,8 +59,8 @@ export function buildComponents() {
 						);
 						const html = readFileSync(htmlPath, 'utf-8');
 
-						// Add to output
-						output[type as keyof BuildOutput][metadata.id] = metadata;
+						// Add to output array
+						output[type as keyof BuildOutput].push(metadata);
 
 						// Write HTML file to dist
 						writeFileSync(join(distPath, type, `${metadata.id}.html`), html);
@@ -67,24 +74,41 @@ export function buildComponents() {
 		}
 	});
 
-	// Write metadata files
-	writeFileSync(
-		join(distPath, 'blocks.json'),
-		JSON.stringify(output.blocks, null, 2)
-	);
+	// Helper function to create paginated files
+	function createPaginatedFiles(items: ComponentMetadata[], type: string) {
+		const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
+		
+		for (let page = 1; page <= totalPages; page++) {
+			const startIndex = (page - 1) * ITEMS_PER_PAGE;
+			const endIndex = startIndex + ITEMS_PER_PAGE;
+			const pageItems = items.slice(startIndex, endIndex);
+			
+			const paginatedData: PaginatedOutput = {
+				items: pageItems,
+				page: page,
+				hasNextPage: page < totalPages
+			};
 
-	writeFileSync(
-		join(distPath, 'templates.json'),
-		JSON.stringify(output.templates, null, 2)
-	);
+			writeFileSync(
+				join(distPath, `${type}-${page}.json`),
+				JSON.stringify(paginatedData, null, 2)
+			);
+		}
+
+		return totalPages;
+	}
+
+	// Create paginated files for blocks and templates
+	const blockPages = createPaginatedFiles(output.blocks, 'blocks');
+	const templatePages = createPaginatedFiles(output.templates, 'templates');
 
 	console.log('\n🎉 Build complete!');
 	console.log(`📁 Generated files in dist/`);
 	console.log(
-		`📄 blocks.json (${Object.keys(output.blocks).length} components)`
+		`📄 blocks: ${output.blocks.length} components across ${blockPages} pages`
 	);
 	console.log(
-		`📄 templates.json (${Object.keys(output.templates).length} components)`
+		`📄 templates: ${output.templates.length} components across ${templatePages} pages`
 	);
 
 	return output;
