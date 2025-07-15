@@ -1,4 +1,5 @@
 import {
+	copyFileSync,
 	existsSync,
 	mkdirSync,
 	readdirSync,
@@ -51,6 +52,7 @@ export function buildComponents() {
 				const componentPath = join(typePath, componentName);
 				const metadataPath = join(componentPath, 'metadata.json');
 				const htmlPath = join(componentPath, 'index.html');
+				const previewPath = join(componentPath, 'preview.png');
 
 				if (existsSync(metadataPath) && existsSync(htmlPath)) {
 					try {
@@ -65,6 +67,11 @@ export function buildComponents() {
 						// Write HTML file to dist
 						writeFileSync(join(distPath, type, `${metadata.id}.html`), html);
 
+						// Copy preview.png file if it exists
+						if (existsSync(previewPath)) {
+							copyFileSync(previewPath, join(distPath, type, `${metadata.id}.png`));
+						}
+
 						console.log(`✓ Built ${type}/${metadata.id}`);
 					} catch (error) {
 						console.error(`✗ Error building ${type}/${componentName}:`, error);
@@ -77,12 +84,12 @@ export function buildComponents() {
 	// Helper function to create paginated files
 	function createPaginatedFiles(items: ComponentMetadata[], type: string) {
 		const totalPages = Math.ceil(items.length / ITEMS_PER_PAGE);
-		
+
 		for (let page = 1; page <= totalPages; page++) {
 			const startIndex = (page - 1) * ITEMS_PER_PAGE;
 			const endIndex = startIndex + ITEMS_PER_PAGE;
 			const pageItems = items.slice(startIndex, endIndex);
-			
+
 			const paginatedData: PaginatedOutput = {
 				items: pageItems,
 				page: page,
