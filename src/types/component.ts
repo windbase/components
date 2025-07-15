@@ -1,7 +1,7 @@
 export interface ComponentMetadata {
   id: string;
   name: string;
-  tags: string[];
+  categories: string[];
   author: string;
 }
 
@@ -16,6 +16,6 @@ export interface ComponentFormData {
   name: string;
   type: 'blocks' | 'templates';
   html: string;
-  tags: string;
+  categories: string;
   author: string;
 } 

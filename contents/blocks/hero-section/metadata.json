@@ -1,7 +1,7 @@
 {
   "id": "hero-section",
   "name": "Hero Section",
-  "tags": [
+  "categories": [
     "hero",
     "call-to-action"
   ],

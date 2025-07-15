@@ -22,8 +22,8 @@ import {
 } from '@/components/ui/select';
 import type { Component } from '../types/component';
 
-// Predefined tag options for components
-const TAG_OPTIONS: Option[] = [
+// Predefined category options for components
+const CATEGORY_OPTIONS: Option[] = [
 	{ value: 'header', label: 'Header' },
 	{ value: 'hero', label: 'Hero' },
 	{ value: 'navigation', label: 'Navigation' },
@@ -80,14 +80,14 @@ const TAG_OPTIONS: Option[] = [
 const componentSchema = z.object({
 	name: z.string().min(1, 'Name is required'),
 	type: z.enum(['blocks', 'templates']),
-	tags: z
+	categories: z
 		.array(
 			z.object({
 				value: z.string(),
 				label: z.string()
 			})
 		)
-		.min(1, 'At least one tag is required'),
+		.min(1, 'At least one category is required'),
 	author: z.string().min(1, 'Author is required')
 });
 
@@ -118,26 +118,26 @@ export function ComponentForm({
 		defaultValues: {
 			name: editingComponent?.metadata.name || '',
 			type: editingComponent?.type || 'blocks',
-			tags:
-				editingComponent?.metadata.tags?.map((tag) => ({
-					value: tag,
-					label: tag.charAt(0).toUpperCase() + tag.slice(1)
+			categories:
+				editingComponent?.metadata.categories?.map((category) => ({
+					value: category,
+					label: category.charAt(0).toUpperCase() + category.slice(1)
 				})) || [],
 			author: editingComponent?.metadata.author || ''
 		}
 	});
 
 	const watchedType = watch('type');
-	const watchedTags = watch('tags');
+	const watchedCategories = watch('categories');
 
 	React.useEffect(() => {
 		if (editingComponent) {
 			reset({
 				name: editingComponent.metadata.name,
 				type: editingComponent.type,
-				tags: editingComponent.metadata.tags.map((tag) => ({
-					value: tag,
-					label: tag.charAt(0).toUpperCase() + tag.slice(1)
+				categories: editingComponent.metadata.categories.map((category) => ({
+					value: category,
+					label: category.charAt(0).toUpperCase() + category.slice(1)
 				})),
 				author: editingComponent.metadata.author
 			});
@@ -145,7 +145,7 @@ export function ComponentForm({
 			reset({
 				name: '',
 				type: 'blocks',
-				tags: [],
+				categories: [],
 				author: ''
 			});
 		}
@@ -159,7 +159,7 @@ export function ComponentForm({
 			metadata: {
 				id: newId,
 				name: data.name,
-				tags: data.tags.map((tag) => tag.value),
+				categories: data.categories.map((category) => category.value),
 				author: data.author
 			},
 			html: '<div class="p-4 bg-gray-100 rounded-lg">\n  <!-- Start building your component here -->\n  <p class="text-gray-600">Your component content goes here...</p>\n</div>',
@@ -223,25 +223,27 @@ export function ComponentForm({
 					</div>
 
 					<div>
-						<Label htmlFor="tags">Tags</Label>
+						<Label htmlFor="categories">Categories</Label>
 						<MultipleSelector
-							value={watchedTags as Option[]}
-							onChange={(options) => setValue('tags', options)}
-							defaultOptions={TAG_OPTIONS}
-							placeholder="Select tags for your component..."
+							value={watchedCategories as Option[]}
+							onChange={(options) => setValue('categories', options)}
+							defaultOptions={CATEGORY_OPTIONS}
+							placeholder="Select categories for your component..."
 							emptyIndicator={
 								<p className="text-center text-sm leading-10 text-muted-foreground">
-									No tags found.
+									No categories found.
 								</p>
 							}
 							className="mt-1"
 							maxSelected={4}
 							onMaxSelected={(maxLimit) => {
-								console.log(`You can select up to ${maxLimit} tags`);
+								console.log(`You can select up to ${maxLimit} categories`);
 							}}
 						/>
-						{errors.tags && (
-							<p className="text-sm text-red-500 mt-1">{errors.tags.message}</p>
+						{errors.categories && (
+							<p className="text-sm text-red-500 mt-1">
+								{errors.categories.message}
+							</p>
 						)}
 					</div>
 

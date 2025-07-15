@@ -8,7 +8,7 @@ A web-based TailwindCSS visual builder for creating and sharing components with 
 - 📦 **Component Library**: Browse and manage blocks and templates
 - 🔍 **Live Preview**: Preview components in a new window with TailwindCSS
 - 📋 **Copy to Clipboard**: Easy copying of component HTML code
-- 🏷️ **Tagging System**: Organize components with tags
+- 🏷️ **Category System**: Organize components with categories
 - 🚀 **Build System**: Generate distribution files for CDN deployment
 - 📱 **Responsive Design**: Built with modern UI components from shadcn/ui
 
@@ -48,7 +48,7 @@ bun run dev
    - **Name**: Display name for your component
    - **Type**: Choose between "Blocks" or "Templates"
    - **Author**: Your name or organization
-   - **Tags**: Comma-separated tags (e.g., "header, hero, call-to-action")
+   - **Categories**: Comma-separated categories (e.g., "header, hero, call-to-action")
    - **HTML Code**: Your TailwindCSS component code
 
 3. Click "Create" to save your component
@@ -110,7 +110,7 @@ Each component includes metadata in `metadata.json`:
 {
   "id": "component-id",
   "name": "Component Name",
-  "tags": ["tag1", "tag2", "tag3"],
+  "categories": ["category1", "category2", "category3"],
   "author": "Author Name"
 }
 ```

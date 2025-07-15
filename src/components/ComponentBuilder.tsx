@@ -300,9 +300,9 @@ function ComponentCard({
 			</CardHeader>
 			<CardContent className="pt-0">
 				<div className="flex flex-wrap gap-1 mb-3">
-					{component.metadata.tags.map((tag) => (
-						<Badge key={tag} variant="secondary" className="text-xs">
-							{tag}
+					{component.metadata.categories.map((category) => (
+						<Badge key={category} variant="secondary" className="text-xs">
+							{category}
 						</Badge>
 					))}
 				</div>

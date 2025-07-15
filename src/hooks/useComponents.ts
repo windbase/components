@@ -150,7 +150,7 @@ export function useComponents() {
 	};
 
 	  useEffect(() => {
-    loadComponents(1, 12, 'blocks');
+    loadComponents(1, 12, 'all');
   }, [loadComponents]);
 
 	return {
