@@ -63,13 +63,21 @@ const server = serve({
 					const body = await req.json();
 					const { component, nameChanged } = body;
 
-					// Generate screenshot using Puppeteer
+					// Get the original component to compare HTML
+					const allComponents = await componentManager.loadAllComponents();
+					const originalComponent = allComponents.find(
+						(c) => c.metadata.id === id
+					);
+
+					// Only generate screenshot if HTML has changed
 					let screenshotData: string | null = null;
-					try {
-						screenshotData = await generateScreenshotDataURL(component.html);
-					} catch (screenshotError) {
-						console.warn('Failed to generate screenshot:', screenshotError);
-						// Continue saving without screenshot
+					if (originalComponent && originalComponent.html !== component.html) {
+						try {
+							screenshotData = await generateScreenshotDataURL(component.html);
+						} catch (screenshotError) {
+							console.warn('Failed to generate screenshot:', screenshotError);
+							// Continue saving without screenshot
+						}
 					}
 
 					const success = await componentManager.updateComponent(
