@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback,  useState } from 'react';
 import type { Component } from '../types/component';
 
 interface PaginatedResponse {
@@ -70,6 +70,7 @@ export function useComponents() {
 			const result = await response.json();
 
 			if (result.success) {
+				// Update local state immediately for better UX
 				setComponents((prev) => [...prev, componentData]);
 			} else {
 				console.error('Error creating component:', result.error);
@@ -104,10 +105,10 @@ export function useComponents() {
 			if (result.success) {
 				if (nameChanged) {
 					// Remove old component and add new one (reflecting folder move)
-					setComponents((prev) =>
-						prev.filter((comp) => comp.metadata.id !== originalId)
-					);
-					setComponents((prev) => [...prev, componentData]);
+					setComponents((prev) => [
+						...prev.filter((comp) => comp.metadata.id !== originalId),
+						componentData
+					]);
 				} else {
 					// Update existing component
 					setComponents((prev) =>
@@ -147,10 +148,6 @@ export function useComponents() {
 			return false;
 		}
 	};
-
-	useEffect(() => {
-		loadComponents(1, 12, 'all');
-	}, [loadComponents]);
 
 	return {
 		components,

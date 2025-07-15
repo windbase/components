@@ -1,5 +1,5 @@
 import { Code, Copy, Edit, Eye, Plus, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,6 +32,11 @@ export function ComponentBuilder() {
 	);
 	const [activeTab, setActiveTab] = useState('blocks');
 
+	// Load components for the active tab on mount
+	useEffect(() => {
+		loadComponents(1, 12, activeTab);
+	}, [loadComponents, activeTab]);
+
 	const handleCreateComponent = () => {
 		setEditingComponent(null);
 		setFormOpen(true);
@@ -56,6 +61,8 @@ export function ComponentBuilder() {
 		} else {
 			const success = await createComponent(data);
 			if (success) {
+				// Reload components to reflect the new component
+				loadComponents(1, 12, activeTab);
 				// Redirect to the editor page
 				navigate(`/edit/${data.type}/${data.metadata.id}`);
 			}
